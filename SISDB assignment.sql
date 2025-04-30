@@ -19,25 +19,25 @@ course_id int primary key auto_increment,
 course_name varchar (255) not null,
 credits int not null,
 teacher_id int ,
-foreign key (teacher_id) references teacher (teacher_id)
+constraint ti foreign key (teacher_id) references teacher (teacher_id)
 );
 Create Table Enrollments(
 enrollment_id int primary key auto_increment,
 students_id int ,
 course_id int,
 enrollment_date date not null,
-foreign key (students_id) references Students (students_id),
-foreign key (course_id) references Courses (course_id)
+constraint fk foreign key (students_id) references Students (students_id) on delete cascade,
+constraint ci foreign key (course_id) references Courses (course_id) on delete cascade
 );
 Create Table Payments(
 payment_id int primary key auto_increment,
 students_id int,
 amount int,
 payment_date date ,
-foreign key (students_id) references Students (students_id)
+constraint si foreign key (students_id) references Students (students_id) on delete cascade
 );
 insert into Students(first_name, last_name, date_of_birth, email, phone_number) VALUES
-('Allan', 'Ronald', '2000-01-15', 'allan.ronald@gmail.com', '1234567890'),
+('Allan', 'Ronald', '2000-01-15', 'allan.ronald@gmail.com', '1234567990'),
 ('Alice', 'Nandhan', '2001-05-22', 'alice.nandhan@gmail.com', '1234567891'),
 ('Boomi', 'Naadhan', '2001-05-28', 'boomi.naadhan@gmail.com', '1234567892'),
 ('Cathlin', 'Jenifer', '2001-08-22', 'cathlin.jenifer@gmail.com', '1234567893'),
@@ -91,7 +91,28 @@ INSERT INTO Payments (students_id, amount, payment_date) VALUES
 (8, 530, '2024-03-16'),
 (9, 610, '2024-04-11'),
 (10, 470, '2024-05-02');
-
-
-
+insert into Students(first_name,last_name,date_of_birth,email,phone_number) values
+('John','Doe','1995-08-15','john.doe@example.com','1234567890');
+insert into Enrollments (students_id, course_id, enrollment_date) VALUES
+(11,3,'2024-06-18');
+update teacher set email = 'patel.90sneh@gmail.com' where teacher_id = 3;
+delete from Enrollments where students_id = 9 and course_id = 9;
+update Courses set teacher_id = 2 where course_id = 1; 
+delete from Enrollments where students_id = 1;
+delete from students where students_id = 2;
+update payments set amount = 570 where students_id = 2;
+select s.students_id , s.first_name, s.last_name , sum(p.amount) as totalpayments
+from Students s
+join payments p on s.students_id = p.students_id
+where s.students_id = 6
+group by s.students_id , s.first_name , s.last_name;
+select c.course_id , c.course_name , count(e.enrollment_id) as count_of_students
+from Courses c
+left join enrollments e on c.course_id = e.course_id
+group by c.course_id , c.course_name 
+order by count_of_students desc;
+select s.students_id , s.first_name , s.last_name 
+from Students s
+left join enrollments e on s.students_id = e.students_id
+where e.enrollment_id is null;
 
