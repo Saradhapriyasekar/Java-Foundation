@@ -115,4 +115,118 @@ select s.students_id , s.first_name , s.last_name
 from Students s
 left join enrollments e on s.students_id = e.students_id
 where e.enrollment_id is null;
+select s.first_name , s.last_name , c.course_name
+from Students s
+join enrollments e on s.students_id = e.students_id
+join courses c on c.course_id = e.course_id;
+select t.teacher_id , t.first_name , t.last_name , c.course_name
+from teacher t
+join courses c on t.teacher_id = c.teacher_id;
+select s.first_name , s.last_name , e.enrollment_date , c.course_name
+from Students s
+join enrollments e on s.students_id = e.students_id
+join courses c on e.course_id = c.course_id
+where e.course_id = 7;
+select s.students_id , s.first_name , s.last_name , p.amount
+from students s
+left join payments p on s.students_id = p.students_id
+where p.amount is null;
+select s.students_id , s.first_name , s.last_name , count(e1.course_id) as coursecount
+from enrollments e1
+join enrollments e2 on e1.students_id = e2.students_id
+and e1.course_id = e2.course_id
+join students s on s.students_id = e1.students_id
+group by s.students_id , s.first_name , s.last_name;
+select t.teacher_id , t.first_name , t.last_name ,c.course_id 
+from teacher t
+left join courses c on t.teacher_id = c.teacher_id
+where c.course_id is null;
+select avg (enrollment_count) as NoStuEnrolled
+from (select course_id , count(*) as enrollment_count
+from enrollments
+group by course_id) as course_enrolled;
+select s.first_name, s.last_name, p.amount
+from Payments p
+join Students s on p.students_id = s.students_id
+where p.amount = (select max(amount)
+from Payments
+);
+select c.course_name, count(e.enrollment_id) as total_enrollments
+from Courses c
+join Enrollments e on c.course_id = e.course_id
+group by c.course_id
+having count(e.enrollment_id) = (select max(enrollment_count)
+from (select course_id, count(*) as enrollment_count
+from Enrollments
+group by course_id) as course_counts
+);
+select t.teacher_id, t.first_name, t.last_name,
+(select sum(p.amount)
+from Courses c
+join Enrollments e on c.course_id = e.course_id
+join Payments p on e.students_id = p.students_id
+where c.teacher_id = t.teacher_id
+) as total_payments
+from Teacher t;
+select s.students_id, s.first_name, s.last_name
+from Students s
+where not exists (select *
+from Courses c
+where not exists (
+select * from Enrollments e
+where e.students_id = s.students_id
+and e.course_id = c.course_id)
+);
+select teacher_id , first_name , last_name 
+from teacher t
+where teacher_id not in (
+select distinct teacher_id from Courses
+where teacher_id is not null
+);
+select avg(timestampdiff(year, date_of_birth, curdate())) as average_age
+from Students;
+select course_id, course_name
+from Courses
+where course_id not in (
+select distinct course_id from Enrollments
+);
+select s.students_id, s.first_name, c.course_name,
+(select sum(p.amount)
+from Payments p
+where p.students_id = s.students_id) as total_payment
+from Students s
+join Enrollments e on s.students_id = e.students_id
+join Courses c on e.course_id = c.course_id;
+select students_id, payment_count
+from (select students_id, count(payment_id) as payment_count
+FROM Payments
+GROUP BY students_id
+) AS payment_summary
+WHERE payment_count > 1;
+select s.students_id, s.first_name, s.last_name, sum(p.amount) as total_payments
+from Students s
+left join Payments p on s.students_id = p.students_id
+group by s.students_id, s.first_name, s.last_name;
+select c.course_id , c.course_name, count(e.students_id) as student_count
+from Courses c
+left join Enrollments e on c.course_id = e.course_id
+group by c.course_id , c.course_name;
+select s.students_id, s.first_name, s.last_name, avg(p.amount) as average_payment
+from Students s
+join Payments p on s.students_id = p.students_id
+group by s.students_id, s.first_name, s.last_name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
